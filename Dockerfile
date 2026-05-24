@@ -1,5 +1,9 @@
 FROM node:25-alpine AS frontend
 WORKDIR /app/frontend
+ARG VITE_BASE_PATH=/
+ARG VITE_API_BASE_URL=
+ENV VITE_BASE_PATH=$VITE_BASE_PATH
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend ./
@@ -14,4 +18,4 @@ RUN pip install --no-cache-dir -r backend/requirements.txt
 COPY backend ./backend
 COPY --from=frontend /app/frontend/dist ./backend/app/static
 EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--app-dir", "backend"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --app-dir backend"]
