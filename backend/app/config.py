@@ -18,6 +18,7 @@ class Settings(BaseSettings):
         alias="STROKE_DATA_CDN_BASE_URL",
     )
     enable_stroke_data_cdn: bool = Field(default=True, alias="ENABLE_STROKE_DATA_CDN")
+    cors_allowed_origins: str = Field(default="*", alias="CORS_ALLOWED_ORIGINS")
 
 
 @lru_cache
