@@ -28,6 +28,11 @@ type HanziWriterData = {
 };
 
 const maxCards = 250;
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '');
+
+function apiUrl(path: string): string {
+  return `${apiBaseUrl}${path}`;
+}
 
 const sample = `你好
 中国
@@ -141,7 +146,7 @@ function App() {
     setStatus('Previewing cards and checking stroke data...');
     setError('');
     try {
-      const response = await fetch('/api/preview', {
+      const response = await fetch(apiUrl('/api/preview'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ deckName, lines }),
@@ -162,7 +167,7 @@ function App() {
     setStatus('Generating deck. Fetching stroke data and definitions...');
     setError('');
     try {
-      const response = await fetch('/api/generate', {
+      const response = await fetch(apiUrl('/api/generate'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ deckName, lines }),
@@ -271,7 +276,9 @@ function App() {
         </section>
       )}
       </main>
-      <aside className="placard">built by Seth</aside>
+      <aside className="placard">
+        built by <a href="https://sethhdowell.com">Seth</a>
+      </aside>
     </>
   );
 }

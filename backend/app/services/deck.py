@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import html
 import tempfile
+import uuid
 import zlib
 from pathlib import Path
 
@@ -150,6 +151,7 @@ def build_apkg(deck_name: str, cards: list[PreviewCard], stroke_html: list[str])
         note = genanki.Note(
             model=ANKI_MODEL,
             fields=[front, back],
+            guid=str(uuid.uuid4()),
         )
         deck.add_note(note)
 

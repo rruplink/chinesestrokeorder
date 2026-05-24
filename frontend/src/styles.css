@@ -350,6 +350,10 @@ button:disabled {
   text-transform: uppercase;
 }
 
+.placard a {
+  color: #e8ff8f;
+}
+
 @media (max-width: 680px) {
   .shell {
     align-content: start;

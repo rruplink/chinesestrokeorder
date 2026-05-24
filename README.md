@@ -40,6 +40,53 @@ npm run dev
 
 The website will run at `http://localhost:5173`.
 
+## Deploying Under an Existing Domain
+
+The easiest production shape is to run this app as a separate service and route
+part of your existing website to it. For example:
+
+```text
+https://yourdomain.com/tools/anki-stroke-order
+```
+
+Build the frontend with the public path and API path that users will see:
+
+```powershell
+cd frontend
+$env:VITE_BASE_PATH="/tools/anki-stroke-order/"
+$env:VITE_API_BASE_URL="/tools/anki-stroke-order"
+npm run build
+```
+
+The Dockerfile already builds the frontend and copies it into the FastAPI app.
+For container deployments, pass the same values as build args:
+
+```powershell
+docker build `
+  --build-arg VITE_BASE_PATH="/tools/anki-stroke-order/" `
+  --build-arg VITE_API_BASE_URL="/tools/anki-stroke-order" `
+  -t anki-stroke-order-generator .
+```
+
+Configure your existing website, reverse proxy, or platform router so requests
+under `/tools/anki-stroke-order` are forwarded to this app. The cleanest setup is
+to strip the prefix before forwarding:
+
+```text
+/tools/anki-stroke-order/*  ->  http://anki-generator-service:8000/*
+```
+
+With that routing, the frontend loads its assets from
+`/tools/anki-stroke-order/` and calls:
+
+```text
+/tools/anki-stroke-order/api/preview
+/tools/anki-stroke-order/api/generate
+```
+
+Those requests reach the FastAPI backend as `/api/preview` and `/api/generate`
+after the proxy removes the `/tools/anki-stroke-order` prefix.
+
 ## Optional Data
 
 The app ships with a tiny built-in dictionary/stroke seed so it works out of the

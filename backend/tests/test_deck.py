@@ -57,3 +57,40 @@ def test_build_apkg_uses_two_front_back_fields():
     assert model["name"] == "Basic Hanzi Writing"
     assert [field["name"] for field in model["flds"]] == ["Front", "Back"]
     assert len(notes[0][0].split("\x1f")) == 2
+
+
+def test_build_apkg_gives_duplicate_text_unique_guids():
+    path = build_apkg(
+        "Duplicate Text Test",
+        [
+            PreviewCard(
+                hanzi="你好",
+                pinyin="nǐ hǎo",
+                definition="hello",
+                missingStrokeChars=[],
+                needsAiLookup=False,
+            ),
+            PreviewCard(
+                hanzi="你好",
+                pinyin="nǐ hǎo",
+                definition="hello",
+                missingStrokeChars=[],
+                needsAiLookup=False,
+            ),
+        ],
+        ["<section>strokes</section>", "<section>strokes</section>"],
+    )
+    with zipfile.ZipFile(path) as archive:
+        db_bytes = archive.read("collection.anki2")
+
+    db_path = Path(str(path) + ".duplicate.anki2")
+    db_path.write_bytes(db_bytes)
+    conn = sqlite3.connect(db_path)
+    try:
+        guids = [row[0] for row in conn.execute("SELECT guid FROM notes").fetchall()]
+    finally:
+        conn.close()
+        db_path.unlink(missing_ok=True)
+
+    assert len(guids) == 2
+    assert len(set(guids)) == 2
